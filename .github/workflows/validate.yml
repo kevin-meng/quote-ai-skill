@@ -19,8 +19,14 @@ jobs:
           python-version: "3.12"
       - name: Compile helper script
         run: python -m compileall skills/quote-ai/scripts
-      - name: Validate Agent Skill install
+      - name: Validate local Agent Skill install
         run: |
-          mkdir -p /tmp/quoteai-skill-test
-          cd /tmp/quoteai-skill-test
+          mkdir -p /tmp/quoteai-skill-local
+          cd /tmp/quoteai-skill-local
           npx --yes skills@latest add "$GITHUB_WORKSPACE" --skill quote-ai --agent codex --copy --yes
+      - name: Validate public GitHub install
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        run: |
+          mkdir -p /tmp/quoteai-skill-public
+          cd /tmp/quoteai-skill-public
+          npx --yes skills@latest add "https://github.com/${{ github.repository }}" --skill quote-ai --agent codex --copy --yes
