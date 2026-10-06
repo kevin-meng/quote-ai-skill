@@ -1,0 +1,26 @@
+name: Validate QuoteAI Skill
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Compile helper script
+        run: python -m compileall skills/quote-ai/scripts
+      - name: Validate Agent Skill install
+        run: |
+          mkdir -p /tmp/quoteai-skill-test
+          cd /tmp/quoteai-skill-test
+          npx --yes skills@latest add "$GITHUB_WORKSPACE" --skill quote-ai --agent codex --copy --yes
